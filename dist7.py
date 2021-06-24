@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 from scipy import integrate
 
-
+import pickle
 
                           #**********Function  for Rayleigh distribution ******************************************************
 
@@ -157,11 +157,43 @@ plt.plot(np.log10(k1),np.log10(arr_sorted**2))
 
 '''
 
+Bx=np.zeros(Nz*Ny*Nx)
+By=np.zeros(Nz*Ny*Nx)
+Bz=np.zeros(Nz*Ny*Nx)
 l=0
 for k in range(Nz):   # y is rows, x is columns in the z=constant plane
 	for i in range(Ny):
 		for j in range(Nx):
-			Bx[l]=y1[i]*Az[l]-z1[k]*Ay[l]
+			Bx[l]=y1[i]*Az[l]-z1[k]*Ay[l])  #only real parts
+			By[l]=-(x1[j]*Az[l]-z1[k]*Ax[l])
+			Bz[l]=x1[j]*Ay[l]-y1[i]*Ax[l]
+			l=l+1
+			
+B=np.sqrt(Bx**2+By**2+Bz**2)	
+mag=np.reshape(B,(Nz,Ny,Nx))
+print (np.min(B),np.max(B))
+
+#plt.plot(k1,B)
+#plt.show()
+zipped_lists = zip(k1,B)  #To check the power-spectrum of A_k vs k   (comment the sorted A_arr)
+
+sorted_lists = sorted(zipped_lists)
+
+b_sorted = [x for B, x in sorted_lists]
+k1.sort()
+k1=np.asarray(k1)
+b_sorted=np.asarray(b_sorted)
+#plt.loglog(k1,b_sorted)
+#arr_sorted[y1<1]=0.0
+plt.plot(np.log10(k1),np.log10(b_sorted**2))
+
+
+plt.show()
+
+
+dbfile=open('mag3d.pkl','wb')
+pickle.dump(mag,dbfile)
+dbfile.close()
 
 
 
