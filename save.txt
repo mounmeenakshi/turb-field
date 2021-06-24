@@ -1,0 +1,158 @@
+    1  cd Downloads/
+    2  bash Anaconda3-2021.05-Linux-x86_64.sh 
+    3  cd
+    4  source .bashrc
+    5  which python
+    6  exit
+    7  sudo apt-get clean
+    8  sudo apt-get update
+    9  sudo apt-get autoremove
+   10  which python
+   11  cd Downloads/
+   12  bash Anaconda3-2021.05-Linux-x86_64.sh 
+   13  cd Downloads/
+   14  bash Anaconda3-2021.05-Linux-x86_64.sh 
+   15  which python
+   16  python --version
+   17  spyder
+   18  which python
+   19  mkae build
+   20  make build
+   21  sudo install gfortran
+   22  sudo apt install gfortran-8
+   23  make build
+   24  sudo apt install gfortran
+   25  make build
+   26  cd ../lab/
+   27  ./map51
+   28  vncserver
+   29  sudo apt install xfce4 xfce4-goodies
+   30  ip address 
+   31  what he fuck
+   32  cd ..
+   33  ls
+   34  cd meenakshi/
+   35  ls
+   36  cd RalphSutherland-mappings-854cd34e14d3/
+   37  ls
+   38  cd src/
+   39  cd
+   40  cd ..
+   41  ls
+   42  cd 
+   43  cd RalphSutherland-mappings-854cd34e14d3/
+   44  cd src/workcode/
+   45  ls
+   46  ls -a
+   47  cd .
+   48  la
+   49  ls
+   50  ls -1
+   51  ls -a
+   52  cd ..
+   53  cd workcode/
+   54  cd ..
+   55  ./map51
+   56  cd ..
+   57  cd lab/
+   58  ls
+   59  cd
+   60  exit
+   61  ./map51
+   62  mke build
+   63  make build
+   64  cd ..lab/
+   65  cd ../lab/
+   66  ./map51
+   67  ./map51 
+   68  ./map51
+   69  make build
+   70  cd ../lab/
+   71  ./map51
+   72  make compile
+   73  make prepare
+   74  cd workcode/
+   75  scp all
+   76  mkae compile
+   77  cd
+   78  cd /usr/local
+   79  ls
+   80  cd src
+   81  ls
+   82  cd ..
+   83  cd share
+   84  ls
+   85  cd mappings/
+   86  ls
+   87  cd ..
+   88  ls
+   89  cd mappings/
+   90  ls
+   91  cd abund/
+   92  ls
+   93  cd ..
+   94  ls
+   95  cd datq
+   96  cd data
+   97  ls
+   98  cd
+   99  cd RalphSutherland-mappings-854cd34e14d3/lab/
+  100  ./map51
+  101  mkdir test
+  102  cd test
+  103  map51
+  104  cd /usr/local/
+  105  cd share/mappings/
+  106  ls
+  107  cd abund/
+  108  ls
+  109  sudo make install
+  110  map51 -std=legacy
+  111  map51
+  112  cd test/Non-Eq-C/
+  113  map51
+  114  cd ..
+  115  map51
+  116  cd .ssh/
+  117  ls
+  118  ssh-keygen -t rsa -b 4096 -C "mounmeenakshi@iucaa.in"
+  119  ls
+  120  gedit id_rsa.pub 
+  121  cd
+  122  ssh -T git@github.com
+  123  cd Documents/
+  124  git clone git@github.com:mounmeenakshi/turb-field.git
+  125  sudo apt install git
+  126  git clone git@github.com:mounmeenakshi/turb-field.git
+  127  ls
+  128  cd turb-field/
+  129  git init -b main
+  130  sudo add-apt-repository -y ppa:git-core/ppa
+  131  sudo apt update 
+  132  sudo apt install git -y
+  133  git init -b main
+  134  git add origin git@github.com:mounmeenakshi/turb-field.git
+  135  git remote add origin git@github.com:mounmeenakshi/turb-field.git
+  136  git pull origin main 
+  137  gedit a.txt
+  138  git status 
+  139  git commit -m "Added"
+  140  git config --global user.email "mounmeenakshi123@gmail.com"
+  141  git config --global user.name "mounmeenakshi"
+  142  git commit -m "Added"
+  143  ls
+  144  git pull origin main 
+  145  ls
+  146  touch a.txt
+  147  git status 
+  148  git add a.txt 
+  149  git commit -m "Added"
+  150  git pushorigin main
+  151  git push origin main
+  152  gedit a.txt 
+  153  git status 
+  154  git commit -m "Modified"
+  155  git commit -a -m "Modified"
+  156  ls
+  157  git push origin main 
+  158  history > save.txt
