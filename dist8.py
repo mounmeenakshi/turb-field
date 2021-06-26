@@ -1,29 +1,27 @@
 '''
-This code computed the A rayleigh distribution for 3-D real fields and its power spectrum.
+This code computed the A rayleigh distribution for 3-D real-complex fields and its power spectrum.
 
 '''
 
 
 import numpy as np
 from matplotlib import pyplot as plt
-import math
-import cmath
+
 from scipy import integrate
-from scipy.optimize import curve_fit
+
 import pickle
 
                           #**********Function  for Rayleigh distribution ******************************************************
 
 def my_dist(A,k1):
-	zeta=3.
+	zeta=1
 	sig2=k1**(-zeta)    #sigma**2
-	return (A/(sig2))*np.exp(-A**2/(2.*sig2))   #((A/(2.*np.pi*sig**2))*np.exp(-A**2/(2.*sig**2)))
+	return (A/(2.*np.pi*sig2))*np.exp(-A**2/(2.*sig2))   #((A/(2.*np.pi*sig**2))*np.exp(-A**2/(2.*sig**2)))
 	
 
 
 
-def func(x,m,c):
-	return m*x+c
+
 
 N = 2000
  
@@ -31,6 +29,7 @@ N = 2000
 Nx=Ny=Nz=100
 
 L=10
+
 
 y1=np.zeros(Ny)  
 
@@ -101,7 +100,7 @@ Ax=np.zeros(Nz*Ny*Nx)
 Ay=np.zeros(Nz*Ny*Nx)
 Az=np.zeros(Nz*Ny*Nx)
 
-zeta=3.
+zeta=1.
  # We assign the A_k for each K-value, based on the sigma for its distribution, we take a range here (of 1 \sigma)
 l=0
 for k in range(Nz):
@@ -111,17 +110,16 @@ for k in range(Nz):
 			A_ky=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)  # choosing randomly the A_x and A_y components of A(K)
 			A_kx=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)
 			A_kz=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)
-			Ax[l]=A_kx;Ay[l]=A_ky;Az[l]=A_kz;
+			phi_x=np.random.uniform(0,2*np.pi);phi_y=np.random.uniform(0,2*np.pi);phi_z=np.random.uniform(0,2*np.pi);
+			Ax[l]=A_kx;Ay[l]=A_ky*np.exp(phi_y);Az[l]=A_kz*np.exp(phi_z);
 			A_arr[l]=np.sqrt(A_kz**2+A_ky**2+A_kx**2)   # taking the magnitude
 			l=l+1
 			#print ('arr',A_arr[i],sigma)
 
 
 print (np.min(A_arr),np.max(A_arr))  
-Ax[k1<1.0]=0;Ay[k1<1.0]=0;Az[k1<1.0]=0.0;
-A_arr[k<0.1]=0
-
 '''
+
 p = my_dist(A_arr,k1)  #using A_k and k values to find the probability distribution
 
 print (np.min(p),np.max(p))
@@ -135,15 +133,11 @@ sorted_lists = sorted(zipped_lists)
 p_sorted = [x for p, x in sorted_lists]   # sorting out the Probability in order of A increasing for plotting
 A_arr.sort()
 
-plt.xlim(0,5)
+plt.xlim(0,1)
 #print (y1t[o:5])
 plt.plot(A_arr,p_sorted)     #plotting the probability distribution and one can check if this is similar to the trial above
 
-
-
-plt.title(r"$\mathrm{Ak\, vs\, Prob.\,}$")
-plt.show()
-
+plt.show() 
 
 
 
@@ -158,18 +152,11 @@ k1=np.asarray(k1)
 arr_sorted=np.asarray(arr_sorted)
 
 #arr_sorted[y1<1]=0.0
-popt, pcov = curve_fit(func,np.log10(k1),np.log10(arr_sorted**2))
-
 plt.plot(np.log10(k1),np.log10(arr_sorted**2))
-plt.plot(np.log10(k1),func(np.log10(k1),*popt), 'r-',label='fit: y= %5.3f x + %5.3f' % tuple(popt))
-plt.legend()
 
-plt.title(r"$\mathrm{k\, vs\, |Ak|^2\, (log-log\,plot)}$")
-plt.show()
+#plt.show()
 
 '''
-#************************ Magnetic field *************************************8
-
 
 Bx=np.zeros(Nz*Ny*Nx)
 By=np.zeros(Nz*Ny*Nx)
@@ -178,30 +165,19 @@ l=0
 for k in range(Nz):   # y is rows, x is columns in the z=constant plane
 	for i in range(Ny):
 		for j in range(Nx):
-			Bx[l]=(y1[i]*Az[l]-z1[k]*Ay[l])
-			By[l]=(-x1[j]*Az[l]+z1[k]*Ax[l])
-			Bz[l]=(x1[j]*Ay[l]-y1[i]*Ax[l])
+			Bx[l]=y1[i]*Az[l]-z1[k]*Ay[l])  #only real parts
+			By[l]=-(x1[j]*Az[l]-z1[k]*Ax[l])
+			Bz[l]=x1[j]*Ay[l]-y1[i]*Ax[l]
 			l=l+1
 			
-
-
-B=np.sqrt(abs(Bx**2+By**2+Bz**2))	    #Check divergence of B is zeros 
-
-#print (np.min(B),np.max(B))
-Bx_fft=np.fft.ifft(Bx*1j)
-By_fft=np.fft.ifft(By*1j)
-Bz_fft=np.fft.ifft(Bz*1j)
-mag1=np.sqrt(Bx_fft.imag**2+By_fft.imag**2+Bz_fft.imag**2+Bx_fft.real**2+By_fft.real**2+Bz_fft.real**2)
-
-print (np.min(mag1),np.max(mag1))
-
-mag=np.reshape(mag1,(Nz,Ny,Nx))
+B=np.sqrt(Bx**2+By**2+Bz**2)	
+mag=np.reshape(B,(Nz,Ny,Nx))
+print (np.min(B),np.max(B))
 
 #plt.plot(k1,B)
 #plt.show()
-
-
 '''
+
 #*********** plot Mag field power spectra ********************************************************************
 zipped_lists = zip(k1,B)  #To check the power-spectrum of A_k vs k   (comment the sorted A_arr)
 
@@ -214,32 +190,17 @@ b_sorted=np.asarray(b_sorted)
 #plt.loglog(k1,b_sorted)
 #arr_sorted[y1<1]=0.0
 plt.plot(np.log10(k1),np.log10(b_sorted**2))
-popt, pcov = curve_fit(func,np.log10(k1),np.log10(b_sorted**2))
 
-plt.plot(np.log10(k1),np.log10(b_sorted**2))
-plt.plot(np.log10(k1),func(np.log10(k1),*popt), 'r-',label='fit: y= %5.3f x + %5.3f' % tuple(popt))
-plt.legend()
-
-plt.title(r"$\mathrm{k\, vs\, |Bk|^2\, (log-log\,plot)}$")
 
 plt.show()
 
 '''
 
 
-
-
-dbfile=open('mag3d_x.pkl','wb')
-pickle.dump(Bx_fft,dbfile)
+dbfile=open('mag3d.pkl','wb')
+pickle.dump(mag,dbfile)
 dbfile.close()
 
-dbfile=open('mag3d_y.pkl','wb')
-pickle.dump(By_fft,dbfile)
-dbfile.close()
-
-dbfile=open('mag3d_z.pkl','wb')
-pickle.dump(Bz_fft,dbfile)
-dbfile.close()
 
 
 
