@@ -71,6 +71,9 @@ for k in range(Nz):   # y is rows, x is columns in the z=constant plane
 			k1[l]=np.sqrt(z1[k]**2+y1[i]**2+x1[j]**2)
 			l=l+1
 
+
+
+print (k1.min(),k1.max())
 #print (y1,x1)
 #print (k)
 
@@ -107,19 +110,20 @@ l=0
 for k in range(Nz):
 	for i in range(Ny):
 		for j in range(Nx):
-			sigma=np.sqrt(abs(k1[l])**(-zeta))  #sigma-- it determined the max of probability A_k =sigma
-			A_ky=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)  # choosing randomly the A_x and A_y components of A(K)
-			A_kx=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)
-			A_kz=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)
-			Ax[l]=A_kx;Ay[l]=A_ky;Az[l]=A_kz;
-			A_arr[l]=np.sqrt(A_kz**2+A_ky**2+A_kx**2)   # taking the magnitude
+			if (k1[l])>0.1:
+				sigma=np.sqrt(k1[l]**(-zeta))  #sigma-- it determined the max of probability A_k =sigma
+				A_ky=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)  # choosing randomly the A_x and A_y components of A(K)
+				A_kx=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)
+				A_kz=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)
+				Ax[l]=A_kx;Ay[l]=A_ky;Az[l]=A_kz;
+				A_arr[l]=np.sqrt(A_kz**2+A_ky**2+A_kx**2)   # taking the magnitude
 			l=l+1
-			#print ('arr',A_arr[i],sigma)
+				#print ('arr',A_arr[i],sigma)
 
 
 print (np.min(A_arr),np.max(A_arr))  
-Ax[k1<1.0]=0;Ay[k1<1.0]=0;Az[k1<1.0]=0.0;
-A_arr[k<0.1]=0
+#Ax[k1<0.1]=0;Ay[k1<0.1]=0;Az[k1<0.1]=0.0;
+#A_arr[k<0.1]=0
 
 '''
 p = my_dist(A_arr,k1)  #using A_k and k values to find the probability distribution
@@ -185,7 +189,7 @@ for k in range(Nz):   # y is rows, x is columns in the z=constant plane
 			
 
 
-B=np.sqrt(abs(Bx**2+By**2+Bz**2))	    #Check divergence of B is zeros 
+B=np.sqrt(Bx**2+By**2+Bz**2)	    #Check divergence of B is zeros, 
 
 #print (np.min(B),np.max(B))
 Bx_fft=np.fft.ifft(Bx*1j)
@@ -200,8 +204,8 @@ mag=np.reshape(mag1,(Nz,Ny,Nx))
 #plt.plot(k1,B)
 #plt.show()
 
-
-'''
+B[B==0]=0.1
+plt.xlim(0.1,1)
 #*********** plot Mag field power spectra ********************************************************************
 zipped_lists = zip(k1,B)  #To check the power-spectrum of A_k vs k   (comment the sorted A_arr)
 
@@ -242,6 +246,6 @@ pickle.dump(Bz_fft,dbfile)
 dbfile.close()
 
 
-
+'''
 
 
