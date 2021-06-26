@@ -14,10 +14,15 @@ import pickle
 
                           #**********Function  for Rayleigh distribution ******************************************************
 
-def my_dist(A,k1):
+def my_dist(A,ks):
 	zeta=3.
-	sig2=k1**(-zeta)    #sigma**2
-	return (A/(sig2))*np.exp(-A**2/(2.*sig2))   #((A/(2.*np.pi*sig**2))*np.exp(-A**2/(2.*sig**2)))
+	sig2=ks**(-zeta)    #sigma**2
+	sig2=2.
+	try:
+		probab=(A/(sig2))*np.exp(-A**2/(2.*sig2))
+
+	except: probab=0.0
+	return probab
 	
 
 
@@ -25,12 +30,12 @@ def my_dist(A,k1):
 def func(x,m,c):
 	return m*x+c
 
-N = 2000
+
  
 
-Nx=Ny=Nz=100
+Nx=Ny=Nz=256
 
-L=10
+L=1
 
 y1=np.zeros(Ny)  
 
@@ -39,6 +44,7 @@ z1=np.zeros(Nz)
 
 arr=np.arange(0,Nx)
 print (len(arr))
+#print (arr)
     #*********The k-space array *************************************
 y1[0:int(Ny/2)]=arr[0:int(Ny/2)]/L
 y1[int(Ny/2):,]=-(Nx-arr[int(Ny/2):,])/L
@@ -50,9 +56,7 @@ x1[int(Nx/2):,]=-(Nx-arr[int(Nx/2):,])/L
 z1[0:int(Nz/2)]=arr[0:int(Nz/2)]/L
 z1[int(Nz/2):,]=-(Nz-arr[int(Nz/2):,])/L
 
-y1[0]=0.000001
-x1[0]=0.00001
-z1[0]=0.00001
+
 #print (y1)
 
 #print (y1[0],y1[1])
@@ -65,14 +69,19 @@ k1=np.zeros((Nz*Ny*Nx))
 #	k[i,:]=np.sqrt(y1[i]**2+x1[:]**2)
 	
 l=0
+'''
 for k in range(Nz):   # y is rows, x is columns in the z=constant plane
 	for i in range(Ny):
 		for j in range(Nx):
 			k1[l]=np.sqrt(z1[k]**2+y1[i]**2+x1[j]**2)
 			l=l+1
 
+'''
+#k1=np.sqrt(z1[np.newaxis,np.newaxis,:]**2+y1[np.newaxis,:,np.newaxis]*+x1[:,np.newaxis,np.newaxis]**2)
 
+print (k1.shape)
 
+#print (k1[126:200])
 print (k1.min(),k1.max())
 #print (y1,x1)
 #print (k)
@@ -110,8 +119,9 @@ l=0
 for k in range(Nz):
 	for i in range(Ny):
 		for j in range(Nx):
-			if (k1[l])>0.1:
-				sigma=np.sqrt(k1[l]**(-zeta))  #sigma-- it determined the max of probability A_k =sigma
+			if (k1[l])>50:
+				sigma=np.sqrt(k1[l]**(-zeta))  #sigma-- it determined the max of probability A_k =sigma	
+				sigma=np.sqrt(2.)
 				A_ky=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)  # choosing randomly the A_x and A_y components of A(K)
 				A_kx=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)
 				A_kz=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)
@@ -121,17 +131,35 @@ for k in range(Nz):
 				#print ('arr',A_arr[i],sigma)
 
 
+
+
+
 print (np.min(A_arr),np.max(A_arr))  
 #Ax[k1<0.1]=0;Ay[k1<0.1]=0;Az[k1<0.1]=0.0;
 #A_arr[k<0.1]=0
 
-'''
+
+
 p = my_dist(A_arr,k1)  #using A_k and k values to find the probability distribution
 
 print (np.min(p),np.max(p))
 
+dbfile=open('mag3d_x.pkl','wb')
+pickle.dump(Ax,dbfile)
+dbfile.close()
+
+dbfile=open('mag3d_y.pkl','wb')
+pickle.dump(Ay,dbfile)
+dbfile.close()
+
+dbfile=open('mag3d_z.pkl','wb')
+pickle.dump(Az,dbfile)
+dbfile.close()
+
 
 # to check sigma 
+
+
 zipped_lists = zip(A_arr,p)
 
 sorted_lists = sorted(zipped_lists)
@@ -139,39 +167,41 @@ sorted_lists = sorted(zipped_lists)
 p_sorted = [x for p, x in sorted_lists]   # sorting out the Probability in order of A increasing for plotting
 A_arr.sort()
 
-plt.xlim(0,5)
+#plt.xlim(0,5)
 #print (y1t[o:5])
 plt.plot(A_arr,p_sorted)     #plotting the probability distribution and one can check if this is similar to the trial above
 
-
+print (p_sorted[0:10])
 
 plt.title(r"$\mathrm{Ak\, vs\, Prob.\,}$")
 plt.show()
 
+'''
+
+k1_c=np.asarray(k1)[A_arr!=0].tolist()
+A_c=A_arr[A_arr!=0].tolist()
 
 
-
-
-zipped_lists = zip(k1,A_arr)  #To check the power-spectrum of A_k vs k   (comment the sorted A_arr)
+zipped_lists = zip(k1_c,A_c)  #To check the power-spectrum of A_k vs k   (comment the sorted A_arr)
 
 sorted_lists = sorted(zipped_lists)
 
-arr_sorted = [x for A_arr, x in sorted_lists]
-k1.sort()
-k1=np.asarray(k1)
+arr_sorted = [x for A_c, x in sorted_lists]
+k1_c.sort()
+k1_c=np.asarray(k1_c)
 arr_sorted=np.asarray(arr_sorted)
 
 #arr_sorted[y1<1]=0.0
-popt, pcov = curve_fit(func,np.log10(k1),np.log10(arr_sorted**2))
+popt, pcov = curve_fit(func,np.log10(k1_c),np.log10(arr_sorted**2))
 
-plt.plot(np.log10(k1),np.log10(arr_sorted**2))
-plt.plot(np.log10(k1),func(np.log10(k1),*popt), 'r-',label='fit: y= %5.3f x + %5.3f' % tuple(popt))
+plt.plot(np.log10(k1_c),np.log10(arr_sorted**2))
+plt.plot(np.log10(k1_c),func(np.log10(k1_c),*popt), 'r-',label='fit: y= %5.3f x + %5.3f' % tuple(popt))
 plt.legend()
 
 plt.title(r"$\mathrm{k\, vs\, |Ak|^2\, (log-log\,plot)}$")
 plt.show()
 
-'''
+
 #************************ Magnetic field *************************************8
 
 
@@ -204,31 +234,34 @@ mag=np.reshape(mag1,(Nz,Ny,Nx))
 #plt.plot(k1,B)
 #plt.show()
 
-B[B==0]=0.1
-plt.xlim(0.1,1)
+
+#plt.xlim(0.1,1)
 #*********** plot Mag field power spectra ********************************************************************
-zipped_lists = zip(k1,B)  #To check the power-spectrum of A_k vs k   (comment the sorted A_arr)
+
+k1_c=np.asarray(k1)[B!=0].tolist()
+B_c=B[B!=0].tolist()
+
+zipped_lists = zip(k1_c,B_c)  #To check the power-spectrum of A_k vs k   (comment the sorted A_arr)
 
 sorted_lists = sorted(zipped_lists)
 
-b_sorted = [x for B, x in sorted_lists]
-k1.sort()
-k1=np.asarray(k1)
+b_sorted = [x for B_c, x in sorted_lists]
+k1_c.sort()
+k1_c=np.asarray(k1_c)
 b_sorted=np.asarray(b_sorted)
 #plt.loglog(k1,b_sorted)
 #arr_sorted[y1<1]=0.0
-plt.plot(np.log10(k1),np.log10(b_sorted**2))
-popt, pcov = curve_fit(func,np.log10(k1),np.log10(b_sorted**2))
+plt.plot(np.log10(k1_c),np.log10(b_sorted**2))
+popt, pcov = curve_fit(func,np.log10(k1_c),np.log10(b_sorted**2))
 
-plt.plot(np.log10(k1),np.log10(b_sorted**2))
-plt.plot(np.log10(k1),func(np.log10(k1),*popt), 'r-',label='fit: y= %5.3f x + %5.3f' % tuple(popt))
+plt.plot(np.log10(k1_c),np.log10(b_sorted**2))
+plt.plot(np.log10(k1_c),func(np.log10(k1_c),*popt), 'r-',label='fit: y= %5.3f x + %5.3f' % tuple(popt))
 plt.legend()
 
 plt.title(r"$\mathrm{k\, vs\, |Bk|^2\, (log-log\,plot)}$")
 
 plt.show()
 
-'''
 
 
 

@@ -7,24 +7,26 @@ mag = pickle.load(dbfile)
 
 dbfile.close()
 
+print (mag.shape)
+N=128
+#mag=np.reshape(mag.real,(N,N,N))
 
-mag1=np.reshape(mag.real,(100,100,100))
-print (np.min(mag),np.max(mag))
-mag_r=mag1[:,70,:]
+#print (np.min(mag),np.max(mag))
+mag_r=mag[20,:,:].real
+#mag_r=mag_r.T
 
-Nx=100
-arr1=np.arange(-50,50)
-arr2=np.arange(-50,50)
-arr3=np.arange(-50,50)
+arr1=np.arange(0,N)
+arr2=np.arange(0,N)
+arr3=np.arange(0,N)
 
 
 fig=plt.figure()
 
 cmap = plt.get_cmap('jet')
 
-c=plt.pcolormesh(arr1,arr2,np.log10(mag_r), cmap=cmap)#,vmin=-3,vmax=-1)#,vmin=-4.177)# vmin=np.min(den_profile),vmax=np.max(den_profile)
+c=plt.pcolormesh(arr1,arr2,np.log10(mag_r), cmap=cmap)#,vmin=-6,vmax=-2)
 cbar=plt.colorbar(c)
-cbar.ax.set_ylabel(r'$\log(\mathrm{n[cm^{-3}]})$',size=14)
+#cbar.ax.set_ylabel(r'$\log(\mathrm{n[cm^{-3}]})$',size=14)
 
 #plt.title(r'Density plot (R-$\phi(\theta\approx 90)$)', fontweight ="bold")
 plt.tight_layout()
