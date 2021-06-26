@@ -8,23 +8,23 @@ mag = pickle.load(dbfile)
 dbfile.close()
 
 print (mag.shape)
-N=128
+Nx=100;Ny=120;Nz=128;
 #mag=np.reshape(mag.real,(N,N,N))
 
 #print (np.min(mag),np.max(mag))
-mag_r=mag[20,:,:].real
-#mag_r=mag_r.T
+mag_r=mag[60,:,:].real
+mag_r=mag_r.T
 
-arr1=np.arange(0,N)
-arr2=np.arange(0,N)
-arr3=np.arange(0,N)
+arr1=np.arange(0,Nx)
+arr2=np.arange(0,Ny)
+arr3=np.arange(0,Nz)
 
 
 fig=plt.figure()
 
 cmap = plt.get_cmap('jet')
 
-c=plt.pcolormesh(arr1,arr2,np.log10(mag_r), cmap=cmap)#,vmin=-6,vmax=-2)
+c=plt.pcolormesh(arr2,arr3,np.log10(mag_r), cmap=cmap)#,vmin=-6,vmax=-2)
 cbar=plt.colorbar(c)
 #cbar.ax.set_ylabel(r'$\log(\mathrm{n[cm^{-3}]})$',size=14)
 

@@ -33,7 +33,9 @@ def func(x,m,c):
  
 
 zeta=3.
-Nx=Ny=Nz=128
+Nx=100
+Ny=120
+Nz=128
 
 L=10.
 
@@ -42,27 +44,33 @@ y1=np.zeros(Ny)
 x1=np.zeros(Nx)
 z1=np.zeros(Nz)
 
-arr=np.arange(0,Nx)
-print (len(arr))
+arrx=np.arange(0,Nx)
+arry=np.arange(0,Ny)
+arrz=np.arange(0,Nz)
+
+#print (len(arr))
 #print (arr)
     #*********The k-space array *************************************
-y1[0:int(Ny/2)]=arr[0:int(Ny/2)]/L
-y1[int(Ny/2):,]=-(Ny-arr[int(Ny/2):,])/L
+y1[0:int(Ny/2)]=arry[0:int(Ny/2)]/L
+y1[int(Ny/2):,]=-(Ny-arry[int(Ny/2):,])/L
 
 #print (np.fft.fftfreq(Nx))
 print (y1)
 
-x1[0:int(Nx/2)]=arr[0:int(Nx/2)]/L
-x1[int(Nx/2):,]=-(Nx-arr[int(Nx/2):,])/L
+x1[0:int(Nx/2)]=arrx[0:int(Nx/2)]/L
+x1[int(Nx/2):,]=-(Nx-arrx[int(Nx/2):,])/L
 
-z1[0:int(Nz/2)]=arr[0:int(Nz/2)]/L
-z1[int(Nz/2):,]=-(Nz-arr[int(Nz/2):,])/L
+z1[0:int(Nz/2)]=arrz[0:int(Nz/2)]/L
+z1[int(Nz/2):,]=-(Nz-arrz[int(Nz/2):,])/L
 
 
-
+#z1 = z1[::-1]
+#x1 = x1[::-1]
 #k1=np.zeros((Nz*Ny*Nx)) 
 
-kx,ky,kz=np.meshgrid(x1,y1,z1)
+ky,kx,kz=np.meshgrid(y1,x1,z1)
+print ('ky shape',ky.shape)
+#print (ky)
 k1=np.sqrt(ky**2+kx**2+kz**2)
 #k1=np.sqrt(z1[np.newaxis,np.newaxis,:]**2+y1[np.newaxis,:,np.newaxis]**2+x1[:,np.newaxis,np.newaxis]**2)
 
@@ -75,25 +83,25 @@ print (k1.min(),k1.max())
 #print (y1,x1)
 #print (k)
 
-
-
 '''
+k1=np.ndarray.flatten(k1)
+
  # To plot the Rayleigh distribution for random A values for the K-space.  To check how Rayleigh distribution looks.
 A_k1=np.random.uniform(low=0,high=10,size=2000)
-zipped_lists = zip(A_k1,k) #sorting k baised on A 
+zipped_lists = zip(A_k1,k1) #sorting k baised on A 
 
 sorted_lists = sorted(zipped_lists)
 
-k_sorted = [x for k, x in sorted_lists]
+k_sorted = [x for k1, x in sorted_lists]
 A_k1.sort()
 k_sorted=np.asarray(k_sorted)
 print (A_k1[0:2],k_sorted[0:2])
 A_k1=np.asarray(A_k1)
 
-#plt.plot(A_k1,my_dist(A_k1,abs(k_sorted)))
+plt.plot(A_k1,my_dist(A_k1,abs(k_sorted)))
 
 
-#plt.show()
+plt.show()
 
 '''
 sigma=np.zeros((Nx,Ny,Nz))
@@ -111,9 +119,9 @@ mask=k1>k_min
 sigma[mask]=np.sqrt(k1[mask]**(-zeta)) 
 #sigma[mask]=2.0
 delta=1.  #deviation around the max probability point
-A_kx[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+3*sigma[mask])
-A_ky[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+3*sigma[mask])
-A_kz[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+3*sigma[mask])
+A_kx[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+delta*sigma[mask])
+A_ky[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+delta*sigma[mask])
+A_kz[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+delta*sigma[mask])
 
 A_arr=np.sqrt(A_kz**2+A_ky**2+A_kx**2) 
 
@@ -129,7 +137,7 @@ A_kx=np.fft.ifftn(A_kx)
 A_ky=np.fft.ifftn(A_ky)
 A_kz=np.fft.ifftn(A_kz)
 
-  
+
 dbfile=open('mag3d_x.pkl','wb')
 pickle.dump(A_kx,dbfile)
 dbfile.close()
@@ -143,7 +151,10 @@ pickle.dump(A_kz,dbfile)
 dbfile.close()
 
 
+
 # to check sigma 
+
+
 
 
 #using A_k and k values to find the probability distribution
@@ -174,6 +185,7 @@ print (p_sorted[0:10])
 plt.title(r"$\mathrm{Ak\, vs\, Prob.\,}$")
 plt.show()
 
+
 A_arr=np.ndarray.flatten(A_arr)
 k1=np.ndarray.flatten(k1)
 k1=np.asarray(k1)[A_arr!=0].tolist()
@@ -199,8 +211,8 @@ plt.legend()
 plt.title(r"$\mathrm{k\, vs\, |Ak|^2\, (log-log\,plot)}$")
 plt.show()
 
-#************************ Magnetic field *************************************8
 
+#************************ Magnetic field *************************************8
 
 
 B=np.zeros(Nx*Ny*Nz)
@@ -219,9 +231,9 @@ for k in range(Nz):   # y is rows, x is columns in the z=constant plane
 
 
 
+
+
 '''
-
-
 Bx = ky*A_kz - kz*A_ky
 By = - kx*A_kz + kz*A_kx
 Bz = kx*A_ky - ky*A_kx
@@ -312,5 +324,4 @@ del Bx
 del By
 del Bz
 del B
-
 
