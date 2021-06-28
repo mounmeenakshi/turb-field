@@ -2,7 +2,7 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 
-dbfile = open('mag3d_z.pkl','rb') 
+dbfile = open('mag3d_x.pkl','rb') 
 mag = pickle.load(dbfile)
 
 dbfile.close()
@@ -12,7 +12,7 @@ Nx=100;Ny=120;Nz=128;
 #mag=np.reshape(mag.real,(N,N,N))
 
 #print (np.min(mag),np.max(mag))
-mag_r=mag[60,:,:].real
+mag_r=mag[20,:,:].real
 mag_r=mag_r.T
 
 arr1=np.arange(0,Nx)

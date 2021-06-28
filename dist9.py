@@ -18,6 +18,7 @@ def my_dist(A,ks):
 	
 	try:
 		sig2=ks**(-zeta)    #sigma**2
+		#sig2=4.
 		probab=(A/(sig2))*np.exp(-A**2/(2.*sig2))
 
 	except: probab=0.0
@@ -32,12 +33,12 @@ def func(x,m,c):
 
  
 
-zeta=3.
-Nx=100
-Ny=120
-Nz=128
+zeta=5.
+Nx=256
+Ny=256
+Nz=256
 
-L=10.
+L=2.
 
 y1=np.zeros(Ny)  
 
@@ -67,34 +68,29 @@ z1[0:int(Nz/2)]=arrz[0:int(Nz/2)]/L
 z1[int(Nz/2):,]=-(Nz-arrz[int(Nz/2):,])/L
 
 '''
-#z1 = z1[::-1]
-#x1 = x1[::-1]
+
 #k1=np.zeros((Nz*Ny*Nx)) 
 
 x1 = np.fft.fftfreq(Nx,d=0.1)  # L=10 now
 y1 = np.fft.fftfreq(Ny,d=0.1) #L =12 here    min 1/(120*0.1)
 z1 = np.fft.fftfreq(Nz,d=0.1)  # L=12.8 
 
-print (y1)
+
+
 ky,kx,kz=np.meshgrid(y1,x1,z1)
+
 #print ('ky shape',ky.shape)
 
-print (kz[99,34,:])
-#print (ky)
+
 k1=np.sqrt(ky**2+kx**2+kz**2)
 
 
-#print (k1[0,0,0])
-#k1=np.sqrt(z1[np.newaxis,np.newaxis,:]**2+y1[np.newaxis,:,np.newaxis]**2+x1[:,np.newaxis,np.newaxis]**2)
-
-print (k1.shape)
-
-#print (k1[126:200])
-print (k1.min(),k1.max())
+#print (k1.shape)
 
 
-#print (y1,x1)
-#print (k)
+print ('wavenumber k min and max',k1.min(),k1.max())
+
+
 
 '''
 k1=np.ndarray.flatten(k1)
@@ -115,29 +111,81 @@ plt.plot(A_k1,my_dist(A_k1,abs(k_sorted)))
 
 
 plt.show()
-
+'''
 
 sigma=np.zeros((Nx,Ny,Nz))
+
+
 A_arr=np.zeros((Nx,Ny,Nz))
 
-A_kx=np.zeros((Nx,Ny,Nz))
-A_ky=np.zeros((Nx,Ny,Nz))
-A_kz=np.zeros((Nx,Ny,Nz))
+A_kx_r=np.zeros((Nx,Ny,Nz))
+A_ky_r=np.zeros((Nx,Ny,Nz))
+A_kz_r=np.zeros((Nx,Ny,Nz))
+A_kx_i=np.zeros((Nx,Ny,Nz))
+A_ky_i=np.zeros((Nx,Ny,Nz))
+A_kz_i=np.zeros((Nx,Ny,Nz))
 
  # We assign the A_k for each K-value, based on the sigma for its distribution, we take a range here (of 1 \sigma)
 
 
-k_min=1
+#k_min=0.1
+
+#print ('k_max,k_min',k_max,k_min)
+
+k_max=max(np.max(abs(x1)),np.max(abs(y1)),np.max(abs(z1)))
+
+k_min=max(np.min(abs(x1[1:])),np.min(abs(y1[1:])),np.min(abs(z1[1:])))
+
+
 mask=k1>k_min
+mask&=k1<k_max
+
+#print (mask)
+#mask &=k1<6.
 sigma[mask]=np.sqrt(k1[mask]**(-zeta)) 
 #sigma[mask]=2.0
 delta=0.5  #deviation around the max probability point
-A_kx[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+delta*sigma[mask])
-A_ky[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+delta*sigma[mask])
-A_kz[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+delta*sigma[mask])
+phi=2*np.pi*np.random.random((Nx,Ny,Nz))
+A_mag=np.zeros((Nx,Ny,Nz))
 
-A_arr=np.sqrt(A_kz**2+A_ky**2+A_kx**2) 
+A_mag[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+delta*sigma[mask])
 
+#print (A_mag)
+#print (phi)
+A_kx_r[mask]=A_mag[mask]*np.cos(phi[mask])
+A_kx_i[mask]=A_mag[mask]*np.sin(phi[mask])
+
+
+del A_mag
+
+A_mag=np.zeros((Nx,Ny,Nz))
+phi=2*np.pi*np.random.random((Nx,Ny,Nz))
+A_mag[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+delta*sigma[mask])
+
+A_ky_r[mask]=A_mag[mask]*np.cos(phi[mask])
+A_ky_i[mask]=A_mag[mask]*np.sin(phi[mask])
+
+
+del A_mag
+
+A_mag=np.zeros((Nx,Ny,Nz))
+phi=2*np.pi*np.random.random((Nx,Ny,Nz))
+A_mag[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+delta*sigma[mask])
+
+
+A_kz_r[mask]=A_mag[mask]*np.cos(phi[mask])
+A_kz_i[mask]=A_mag[mask]*np.sin(phi[mask])
+
+del A_mag
+del phi
+
+#print ('max_Aky',np.max(A_ky_i[mask]))
+
+A_arr=np.sqrt(A_kz_i**2+A_kz_r**2+A_ky_i**2+A_ky_r**2+A_kx_i**2+A_kx_r**2) 
+
+#A_arr=np.sqrt(A_kz**2+A_ky**2+A_kx**2) 
+#print (A_arr[mask])
+#print (np.exp(2*np.pi*0.234*1j))
 
 
 
@@ -146,20 +194,21 @@ print (np.min(A_arr),np.max(A_arr))
 #Ax[k1<0.1]=0;Ay[k1<0.1]=0;Az[k1<0.1]=0.0;
 #A_arr[k<0.1]=0
 
-A_kx=np.fft.ifftn(A_kx)
-A_ky=np.fft.ifftn(A_ky)
-A_kz=np.fft.ifftn(A_kz)
+
+A_kx=np.fft.ifftn(A_kx_r+A_kx_i*1.j)
+A_ky=np.fft.ifftn(A_ky_r+A_ky_i*1.j)
+A_kz=np.fft.ifftn(A_kz_r+A_kz_i*1.j)
 
 
-dbfile=open('mag3d_x.pkl','wb')
+dbfile=open('akx3d_x.pkl','wb')
 pickle.dump(A_kx,dbfile)
 dbfile.close()
 
-dbfile=open('mag3d_y.pkl','wb')
+dbfile=open('aky3d_y.pkl','wb')
 pickle.dump(A_ky,dbfile)
 dbfile.close()
 
-dbfile=open('mag3d_z.pkl','wb')
+dbfile=open('akz3d_z.pkl','wb')
 pickle.dump(A_kz,dbfile)
 dbfile.close()
 
@@ -169,9 +218,10 @@ dbfile.close()
 
 
 
-
 #using A_k and k values to find the probability distribution
 
+
+'''
 A_arr=np.ndarray.flatten(A_arr)
 k1=np.ndarray.flatten(k1)
 p = my_dist(A_arr,k1)
@@ -227,7 +277,6 @@ plt.show()
 
 #************************ Magnetic field *************************************8
 
-
 B=np.zeros(Nx*Ny*Nz)
 Bx=np.zeros((Nx,Ny,Nz))
 By=np.zeros((Nx,Ny,Nz))
@@ -244,24 +293,54 @@ for k in range(Nz):   # y is rows, x is columns in the z=constant plane
 
 
 
+
+
 '''
 
+#Bx=np.zeros((Nx,Ny,Nz))
+#By=np.zeros((Nx,Ny,Nz))
+#Bz=np.zeros((Nx,Ny,Nz))
+
+#print ([mask])
+
+#print (np.max(A_kz))
+Bx= (ky*(A_kz_r*1.j-A_kz_i) - kz*(A_ky_r*1.j-A_ky_i))
+By =(- kx*(A_kz_r*1.j-A_kz_i) + kz*(A_kx_r*1.j-A_kx_i))     # i**2= -1.
+Bz = (kx*(A_ky_r*1.j-A_ky_i) - ky*(A_kx_r*1.j-A_kx_i))
 
 
-'''
-Bx = ky*A_kz - kz*A_ky
-By = - kx*A_kz + kz*A_kx
-Bz = kx*A_ky - ky*A_kx
+print ('sum',np.sum(Bx+By+Bz))
 
-
+print ('Bx_real',np.max(Bx.imag),np.max(Bx.real))
 #print (np.min(B),np.max(B))
-Bx_fft=np.fft.ifftn(Bx*1.j)
-By_fft=np.fft.ifftn(By*1.j)
-Bz_fft=np.fft.ifftn(Bz*1.j)
+Bx_fft=np.fft.ifftn(Bx)
+By_fft=np.fft.ifftn(By)
+Bz_fft=np.fft.ifftn(Bz)
+
+#B=np.zeros(Nx*Ny*Nz)
+'''
+#########Check if the divergence of magnetic field is zeros in real space, for check in k-space, just multiply Bi by ki
+
+Bx_fft=np.ndarray.flatten(Bx_fft)
+By_fft=np.ndarray.flatten(By_fft)
+Bz_fft=np.ndarray.flatten(Bz_fft)
+
+Bx_check=(Bx_fft[1:]-Bx_fft[-1:])/5.
+By_check=(By_fft[1:]-By_fft[-1:])/5.
+Bz_check=(Bz_fft[1:]-Bz_fft[-1:])/5.
 
 
 
-B=np.sqrt(Bx**2+By**2+Bz**2)
+
+Bx_check=(Bx_fft[1:,1:,1:]-Bx_fft[-1:,-1:,-1:])/0.1
+By_check=(By_fft[1:,1:,1:]-By_fft[-1:,-1:,-1:])/0.1
+Bz_check=(Bz_fft[1:,1:,1:]-Bz_fft[-1:,-1:,-1:])/0.1
+
+print (np.sum(Bx_check+By_check+Bz_check))
+
+
+'''
+B=np.sqrt(Bx.real**2+Bx.imag**2+By.real**2+By.imag**2+Bz.real**2+Bz.imag**2)
 #mag1=np.sqrt(Bx_fft.imag**2+By_fft.imag**2+Bz_fft.imag**2+Bx_fft.real**2+By_fft.real**2+Bz_fft.real**2)
 
 #print (np.min(mag1),np.max(mag1))
@@ -275,13 +354,21 @@ B=np.sqrt(Bx**2+By**2+Bz**2)
 #plt.xlim(0.1,1)
 #********************* plot Mag field power spectra ***************************************************
 
-
+del A_kz_r,A_kz_i
+del A_ky_r,A_ky_i
+del A_kx_r,A_kx_i
+del sigma
+del k1
+'''
 B=np.ndarray.flatten(B)
 k1=np.ndarray.flatten(k1)
 
+print (B)
 
 k1=np.asarray(k1)[B!=0].tolist()
 B=B[B!=0].tolist()
+
+
 
 zipped_lists = zip(k1,B)  #To check the power-spectrum of A_k vs k   (comment the sorted A_arr)
 
@@ -303,13 +390,7 @@ plt.legend()
 plt.title(r"$\mathrm{k\, vs\, |Bk|^2\, (log-log\,plot)}$")
 
 plt.show()
-
-
-
-#Bx_fft=np.fft.ifftn(Bx*1.j)
-#By_fft=np.fft.ifftn(By*1.j)
-#Bz_fft=np.fft.ifftn(Bz*1.j)
-
+'''
 
 dbfile=open('mag3d_x.pkl','wb')
 pickle.dump(Bx_fft,dbfile)
@@ -329,14 +410,9 @@ dbfile.close()
 
 
 
-del A_kz
-del A_ky
-del A_kx
-del sigma
-del k1
 
 del Bx
 del By
 del Bz
 del B
-'''
+
