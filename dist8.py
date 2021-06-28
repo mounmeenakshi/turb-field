@@ -15,13 +15,13 @@ import pickle
                           #**********Function  for Rayleigh distribution ******************************************************
 
 def my_dist(A,ks):
-	zeta=3.
-	sig2=ks**(-zeta)    #sigma**2
-	sig2=1.
-	if (ks==0.0):
-		probab=0.0
-	else:
-		probab=(A/(sig2))*np.exp(-A**2/(2.*sig2))   #((A/(2.*np.pi*sig**2))*np.exp(-A**2/(2.*sig**2)))
+	
+	try:
+		sig2=ks**(-zeta)    #sigma**2
+		#sig2=4.
+		probab=(A/(sig2))*np.exp(-A**2/(2.*sig2))
+
+	except: probab=0.0
 	return probab
 	
 
@@ -33,135 +33,195 @@ def func(x,m,c):
 
  
 
-Nx=Ny=Nz=100
+zeta=3.
+Nx=100
+Ny=120
+Nz=128
 
-L=10
+L=10.
 
 y1=np.zeros(Ny)  
 
 x1=np.zeros(Nx)
 z1=np.zeros(Nz)
 
-arr=np.arange(0,Nx)
-print (len(arr))
+arrx=np.arange(0,Nx)
+arry=np.arange(0,Ny)
+arrz=np.arange(0,Nz)
+
+#print (len(arr))
+#print (arr)
     #*********The k-space array *************************************
-y1[0:int(Ny/2)]=arr[0:int(Ny/2)]/L
-y1[int(Ny/2):,]=-(Nx-arr[int(Ny/2):,])/L
-
-
-x1[0:int(Nx/2)]=arr[0:int(Nx/2)]/L
-x1[int(Nx/2):,]=-(Nx-arr[int(Nx/2):,])/L
-
-z1[0:int(Nz/2)]=arr[0:int(Nz/2)]/L
-z1[int(Nz/2):,]=-(Nz-arr[int(Nz/2):,])/L
-
-
-#print (y1)
-
-#print (y1[0],y1[1])
-
-
-#print (np.min(y1t),np.max(y1t))
-k1=np.zeros((Nz*Ny*Nx)) 
-#l=0
-#for i in range(Ny):
-#	k[i,:]=np.sqrt(y1[i]**2+x1[:]**2)
-	
-l=0
-for k in range(Nz):   # y is rows, x is columns in the z=constant plane
-	for i in range(Ny):
-		for j in range(Nx):
-			k1[l]=np.sqrt(z1[k]**2+y1[i]**2+x1[j]**2)
-			l=l+1
-
-
-
-print (k1.min(),k1.max())
-#print (y1,x1)
-#print (k)
-
 
 
 '''
+y1[0:int(Ny/2)]=arry[0:int(Ny/2)]/L
+y1[int(Ny/2):,]=-(Ny-arry[int(Ny/2):,])/L
+
+print (np.fft.fftfreq(Nx))
+print (y1)
+
+x1[0:int(Nx/2)]=arrx[0:int(Nx/2)]/L
+x1[int(Nx/2):,]=-(Nx-arrx[int(Nx/2):,])/L
+
+z1[0:int(Nz/2)]=arrz[0:int(Nz/2)]/L
+z1[int(Nz/2):,]=-(Nz-arrz[int(Nz/2):,])/L
+
+'''
+
+#k1=np.zeros((Nz*Ny*Nx)) 
+
+x1 = np.fft.fftfreq(Nx,d=0.1)  # L=10 now
+y1 = np.fft.fftfreq(Ny,d=0.1) #L =12 here    min 1/(120*0.1)
+z1 = np.fft.fftfreq(Nz,d=0.1)  # L=12.8 
+
+#z1 = z1[::-1]
+#y1 = y1[::-1]
+#x1 = x1[::-1]
+
+#print (y1)
+ky,kx,kz=np.meshgrid(y1,x1,z1)
+#print ('ky shape',ky.shape)
+
+#print (kz[99,34,:])
+#print (ky)
+k1=np.sqrt(ky**2+kx**2+kz**2)
+
+
+#print (k1[0,0,0])
+#k1=np.sqrt(z1[np.newaxis,np.newaxis,:]**2+y1[np.newaxis,:,np.newaxis]**2+x1[:,np.newaxis,np.newaxis]**2)
+
+print (k1.shape)
+
+#print (k1[126:200])
+print (k1.min(),k1.max())
+
+
+#print (y1,x1)
+#print (k)
+
+'''
+k1=np.ndarray.flatten(k1)
+
  # To plot the Rayleigh distribution for random A values for the K-space.  To check how Rayleigh distribution looks.
 A_k1=np.random.uniform(low=0,high=10,size=2000)
-zipped_lists = zip(A_k1,k) #sorting k baised on A 
+zipped_lists = zip(A_k1,k1) #sorting k baised on A 
 
 sorted_lists = sorted(zipped_lists)
 
-k_sorted = [x for k, x in sorted_lists]
+k_sorted = [x for k1, x in sorted_lists]
 A_k1.sort()
 k_sorted=np.asarray(k_sorted)
 print (A_k1[0:2],k_sorted[0:2])
 A_k1=np.asarray(A_k1)
 
-#plt.plot(A_k1,my_dist(A_k1,abs(k_sorted)))
+plt.plot(A_k1,my_dist(A_k1,abs(k_sorted)))
 
 
-#plt.show()
-
+plt.show()
 '''
 
-A_arr=np.zeros(Nz*Ny*Nx)
-Ax=np.zeros(Nz*Ny*Nx)
-Ay=np.zeros(Nz*Ny*Nx)
-Az=np.zeros(Nz*Ny*Nx)
+sigma=np.zeros((Nx,Ny,Nz))
+A_arr=np.zeros((Nx,Ny,Nz))
 
-zeta=3.
+A_kx=np.zeros((Nx,Ny,Nz))
+A_ky=np.zeros((Nx,Ny,Nz))
+A_kz=np.zeros((Nx,Ny,Nz))
+
  # We assign the A_k for each K-value, based on the sigma for its distribution, we take a range here (of 1 \sigma)
-l=0
-for k in range(Nz):
-	for i in range(Ny):
-		for j in range(Nx):
-			if (k1[l])>0.17:
-				sigma=np.sqrt(k1[l]**(-zeta))  #sigma-- it determined the max of probability A_k =sigma	
-				sigma=1.
-				A_ky=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)  # choosing randomly the A_x and A_y components of A(K)
-				A_kx=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)
-				A_kz=np.random.uniform(sigma-0.5*sigma,sigma+0.5*sigma)
-				Ax[l]=A_kx;Ay[l]=A_ky;Az[l]=A_kz;
-				A_arr[l]=np.sqrt(A_kz**2+A_ky**2+A_kx**2)   # taking the magnitude
-			l=l+1
-				#print ('arr',A_arr[i],sigma)
 
 
+k_min=0.1
+mask=k1>k_min
+
+#print (mask)
+#mask &=k1<6.
+sigma[mask]=np.sqrt(k1[mask]**(-zeta)) 
+#sigma[mask]=2.0
+delta=1.  #deviation around the max probability point
+A_kx[mask]= np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+delta*sigma[mask])*np.exp(2*np.pi*np.random.random()*1.j)
+A_ky[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+delta*sigma[mask])*np.exp(2*np.pi*np.random.random()*1.j)
+A_kz[mask]=np.random.uniform(sigma[mask]-delta*sigma[mask],sigma[mask]+delta*sigma[mask])*np.exp(2*np.pi*np.random.random()*1.j)
+
+print ('max_Aky',np.max(A_kx[mask]))
+
+A_arr=np.sqrt(A_kz.imag**2+A_kz.real**2+A_ky.imag**2+A_ky.real**2+A_kx.imag**2+A_kx.real**2) 
+
+#A_arr=np.sqrt(A_kz**2+A_ky**2+A_kx**2) 
+#print (A_arr[mask])
+#print (np.exp(2*np.pi*0.234*1j))
+
+
+
+# saving the vector potential in real space after ifftn
 print (np.min(A_arr),np.max(A_arr))  
+#Ax[k1<0.1]=0;Ay[k1<0.1]=0;Az[k1<0.1]=0.0;
+#A_arr[k<0.1]=0
 
 
-A_c=np.asarray(A_arr)[k1!=0].tolist()
-k1_c=k1[k1!=0].tolist()
+A_kx=np.fft.ifftn(A_kx)
+A_ky=np.fft.ifftn(A_ky)
+A_kz=np.fft.ifftn(A_kz)
 
-p = my_dist(A_c,k1_c)  #using A_k and k values to find the probability distribution
 
-print (np.min(p),np.max(p))
+dbfile=open('mag3d_x.pkl','wb')
+pickle.dump(A_kx,dbfile)
+dbfile.close()
+
+dbfile=open('mag3d_y.pkl','wb')
+pickle.dump(A_ky,dbfile)
+dbfile.close()
+
+dbfile=open('mag3d_z.pkl','wb')
+pickle.dump(A_kz,dbfile)
+dbfile.close()
+
 
 
 # to check sigma 
-zipped_lists = zip(A_c,p)
+
+
+'''
+#using A_k and k values to find the probability distribution
+
+A_arr=np.ndarray.flatten(A_arr)
+k1=np.ndarray.flatten(k1)
+p = my_dist(A_arr,k1)
+
+p=np.asarray(p)[A_arr!=0].tolist()
+A_arr=A_arr[A_arr!=0].tolist()
+
+print (np.min(p),np.max(p))
+
+zipped_lists = zip(A_arr,p)
 
 sorted_lists = sorted(zipped_lists)
 
+
 p_sorted = [x for p, x in sorted_lists]   # sorting out the Probability in order of A increasing for plotting
-A_c.sort()
+A_arr.sort()
 
-plt.xlim(0,5)
+#plt.xlim(0,5)
 #print (y1t[o:5])
-plt.plot(A_c,p_sorted)     #plotting the probability distribution and one can check if this is similar to the trial above
+plt.plot(A_arr,p_sorted)     #plotting the probability distribution and one can check if this is similar to the trial above
 
-
+print (p_sorted[0:10])
 
 plt.title(r"$\mathrm{Ak\, vs\, Prob.\,}$")
 plt.show()
 
-
 '''
+A_arr=np.ndarray.flatten(A_arr)
+k1=np.ndarray.flatten(k1)
+k1=np.asarray(k1)[A_arr!=0].tolist()
+A_arr=A_arr[A_arr!=0].tolist()
 
 
 zipped_lists = zip(k1,A_arr)  #To check the power-spectrum of A_k vs k   (comment the sorted A_arr)
 
 sorted_lists = sorted(zipped_lists)
 
-arr_sorted = [x for A_arr, x in sorted_lists]
+arr_sorted = [x for A, x in sorted_lists]
 k1.sort()
 k1=np.asarray(k1)
 arr_sorted=np.asarray(arr_sorted)
@@ -176,70 +236,102 @@ plt.legend()
 plt.title(r"$\mathrm{k\, vs\, |Ak|^2\, (log-log\,plot)}$")
 plt.show()
 
-'''
+
 #************************ Magnetic field *************************************8
 
-
-Bx=np.zeros(Nz*Ny*Nx)
-By=np.zeros(Nz*Ny*Nx)
-Bz=np.zeros(Nz*Ny*Nx)
+'''
+B=np.zeros(Nx*Ny*Nz)
+Bx=np.zeros((Nx,Ny,Nz))
+By=np.zeros((Nx,Ny,Nz))
+Bz=np.zeros((Nx,Ny,Nz))
 l=0
 for k in range(Nz):   # y is rows, x is columns in the z=constant plane
 	for i in range(Ny):
 		for j in range(Nx):
-			Bx[l]=(y1[i]*Az[l]-z1[k]*Ay[l])
-			By[l]=(-x1[j]*Az[l]+z1[k]*Ax[l])
-			Bz[l]=(x1[j]*Ay[l]-y1[i]*Ax[l])
+			Bx[j,i,k]=(ky[j,i,k]*A_kz[j,i,k]-kz[j,i,k]*A_ky[j,i,k])
+			By[j,i,k]=-(kx[j,i,k]*A_kz[j,i,k]-kz[j,i,k]*A_kx[j,i,k])
+			Bz[j,i,k]=(kx[j,i,k]*A_ky[j,i,k]-ky[j,i,k]*A_kx[j,i,k])
 			l=l+1
-			
+	
 
 
-B=np.sqrt(Bx**2+By**2+Bz**2)	    #Check divergence of B is zeros, 
 
+'''
+
+
+
+Bx=np.zeros((Nx,Ny,Nz))
+#By=np.zeros((Nx,Ny,Nz))
+#Bz=np.zeros((Nx,Ny,Nz))
+
+#print ([mask])
+
+print (np.max(A_kz))
+Bx= (ky*A_kz - kz*A_ky)*1.j
+By =(- kx*A_kz + kz*A_kx)*1.j
+Bz = (kx*A_ky - ky*A_kx)*1.j
+
+
+print (np.max(Bx))
 #print (np.min(B),np.max(B))
-Bx_fft=np.fft.ifft(Bx*1j)
-By_fft=np.fft.ifft(By*1j)
-Bz_fft=np.fft.ifft(Bz*1j)
-mag1=np.sqrt(Bx_fft.imag**2+By_fft.imag**2+Bz_fft.imag**2+Bx_fft.real**2+By_fft.real**2+Bz_fft.real**2)
+Bx_fft=np.fft.ifftn(Bx)
+By_fft=np.fft.ifftn(By)
+Bz_fft=np.fft.ifftn(Bz)
 
-print (np.min(mag1),np.max(mag1))
+#B=np.zeros(Nx*Ny*Nz)
 
-mag=np.reshape(mag1,(Nz,Ny,Nx))
+
+
+B=np.sqrt(Bx.real**2+Bx.imag**2+By.real**2+By.imag**2+Bz.real**2+Bz.imag**2)
+#mag1=np.sqrt(Bx_fft.imag**2+By_fft.imag**2+Bz_fft.imag**2+Bx_fft.real**2+By_fft.real**2+Bz_fft.real**2)
+
+#print (np.min(mag1),np.max(mag1))
+
+#mag=np.reshape(mag1,(Nz,Ny,Nx))
 
 #plt.plot(k1,B)
 #plt.show()
 
 
 #plt.xlim(0.1,1)
-#*********** plot Mag field power spectra ********************************************************************
+#********************* plot Mag field power spectra ***************************************************
 
-k1_c=np.asarray(k1)[B!=0].tolist()
-B_c=B[B!=0].tolist()
 
-zipped_lists = zip(k1_c,B_c)  #To check the power-spectrum of A_k vs k   (comment the sorted A_arr)
+B=np.ndarray.flatten(B)
+k1=np.ndarray.flatten(k1)
+
+print (B)
+
+k1=np.asarray(k1)[B!=0].tolist()
+B=B[B!=0].tolist()
+
+
+
+zipped_lists = zip(k1,B)  #To check the power-spectrum of A_k vs k   (comment the sorted A_arr)
 
 sorted_lists = sorted(zipped_lists)
 
-b_sorted = [x for B_c, x in sorted_lists]
-k1_c.sort()
-k1_c=np.asarray(k1_c)
+b_sorted = [x for B, x in sorted_lists]
+k1.sort()
+k1=np.asarray(k1)
 b_sorted=np.asarray(b_sorted)
 #plt.loglog(k1,b_sorted)
 #arr_sorted[y1<1]=0.0
-plt.plot(np.log10(k1_c),np.log10(b_sorted**2))
-popt, pcov = curve_fit(func,np.log10(k1_c),np.log10(b_sorted**2))
+plt.plot(np.log10(k1),np.log10(b_sorted**2))
+popt, pcov = curve_fit(func,np.log10(k1),np.log10(b_sorted**2))
 
-plt.plot(np.log10(k1_c),np.log10(b_sorted**2))
-plt.plot(np.log10(k1_c),func(np.log10(k1_c),*popt), 'r-',label='fit: y= %5.3f x + %5.3f' % tuple(popt))
+plt.plot(np.log10(k1),np.log10(b_sorted**2))
+plt.plot(np.log10(k1),func(np.log10(k1),*popt), 'r-',label='fit: y= %5.3f x + %5.3f' % tuple(popt))
 plt.legend()
 
 plt.title(r"$\mathrm{k\, vs\, |Bk|^2\, (log-log\,plot)}$")
 
 plt.show()
 
-'''
 
-
+#Bx_fft=np.fft.ifftn(Bx*1.j)
+#By_fft=np.fft.ifftn(By*1.j)
+#Bz_fft=np.fft.ifftn(Bz*1.j)
 
 
 dbfile=open('mag3d_x.pkl','wb')
@@ -254,7 +346,19 @@ dbfile=open('mag3d_z.pkl','wb')
 pickle.dump(Bz_fft,dbfile)
 dbfile.close()
 
+dbfile=open('mag3d.pkl','wb')
+pickle.dump(B,dbfile)
+dbfile.close()
 
-'''
 
+del A_kz
+del A_ky
+del A_kx
+del sigma
+del k1
+
+del Bx
+del By
+del Bz
+del B
 

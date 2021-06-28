@@ -2,17 +2,17 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 
-dbfile = open('mag3d_z.pkl','rb') 
+dbfile = open('mag3d_x.pkl','rb') 
 mag = pickle.load(dbfile)
 
 dbfile.close()
 
 print (mag.shape)
-Nx=100;Ny=120;Nz=128;
+Nx=128;Ny=128;Nz=128;
 #mag=np.reshape(mag.real,(N,N,N))
 
 #print (np.min(mag),np.max(mag))
-mag_r=mag[60,:,:].real
+mag_r=mag[30,:,:].real
 mag_r=mag_r.T
 
 arr1=np.arange(0,Nx)
@@ -33,3 +33,4 @@ plt.tight_layout()
 #plt.grid()
 #fig.savefig('/mnt/home/student/cmeenakshi/public/folders/images_236/temp_t_90_shock_100.png',dpi=300)
 plt.show()
+del mag,mag_r,arr1,arr2,arr3
