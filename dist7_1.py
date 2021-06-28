@@ -33,9 +33,9 @@ def func(x,m,c):
  
 
 zeta=3.
-Nx=100
-Ny=120
-Nz=128
+Nx=10
+Ny=12
+Nz=14
 
 L=10.
 
@@ -69,8 +69,10 @@ z1[int(Nz/2):,]=-(Nz-arrz[int(Nz/2):,])/L
 #k1=np.zeros((Nz*Ny*Nx)) 
 
 ky,kx,kz=np.meshgrid(y1,x1,z1)
-print ('ky shape',ky.shape)
-#print (ky)
+#print ('ky shape',ky.shape)
+
+print (ky)
+print (ky[0,0,:],ky[1,0,:])
 k1=np.sqrt(ky**2+kx**2+kz**2)
 #k1=np.sqrt(z1[np.newaxis,np.newaxis,:]**2+y1[np.newaxis,:,np.newaxis]**2+x1[:,np.newaxis,np.newaxis]**2)
 
