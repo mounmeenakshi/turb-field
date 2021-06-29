@@ -8,15 +8,14 @@ mag = pickle.load(dbfile)
 dbfile.close()
 
 print (mag.shape)
-Nx=128;Ny=128;Nz=128;
+Nx=256;Ny=256;Nz=256;
 #mag=np.reshape(mag.real,(N,N,N))
 
 #print (np.min(mag),np.max(mag))
-<<<<<<< HEAD
+
 mag_r=mag[40,:,:].real
-=======
-mag_r=mag[30,:,:].real
->>>>>>> c2b9b365b955ff3011e5518cd60d81f25f398f4a
+
+
 mag_r=mag_r.T
 
 arr1=np.arange(0,Nx)

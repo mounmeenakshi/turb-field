@@ -24,9 +24,9 @@ def func(x,m,c):
  
 
 zeta=11./3.
-Nx=128
-Ny=128
-Nz=128
+Nx=256
+Ny=256
+Nz=256
 
 L=2.
 
@@ -133,9 +133,9 @@ mask&=k1<k_max
 
 #print (mask)
 #mask &=k1<6.
-#sigma[mask]=np.sqrt(k1[mask]**(-zeta)) 
-k_0=k_min+1.0
-sigma[mask]=np.sqrt((k1[mask]**2)*np.exp(-k1[mask]**2/k_0**2))
+sigma[mask]=np.sqrt(k1[mask]**(-zeta)) 
+k_0=k_min+0.5
+#sigma[mask]=np.sqrt((k1[mask]**2)*np.exp(-k1[mask]**2/k_0**2))
 #sigma[mask]=2.0
 phi=2*np.pi*np.random.uniform(0,1,(Nx,Ny,Nz))
 A_mag=np.zeros((Nx,Ny,Nz))
@@ -322,8 +322,8 @@ del A_kz_r,A_kz_i
 del A_ky_r,A_ky_i
 del A_kx_r,A_kx_i
 del sigma
-
-
+del k1
+'''
 B=np.ndarray.flatten(B)
 k1=np.ndarray.flatten(k1)
 
@@ -372,9 +372,9 @@ dbfile=open('mag3d.pkl','wb')
 pickle.dump(B,dbfile)
 dbfile.close()
 
-'''
 
-del k1
+
+
 del Bx
 del By
 del Bz
