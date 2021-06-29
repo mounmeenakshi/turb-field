@@ -2,13 +2,13 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 
-dbfile = open('mag3d_x.pkl','rb') 
+dbfile = open('ak3d_y.pkl','rb') 
 mag = pickle.load(dbfile)
 
 dbfile.close()
 
 print (mag.shape)
-Nx=100;Ny=120;Nz=128;
+Nx=128;Ny=128;Nz=128;
 #mag=np.reshape(mag.real,(N,N,N))
 
 #print (np.min(mag),np.max(mag))
