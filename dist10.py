@@ -23,7 +23,7 @@ def func(x,m,c):
 
  
 
-zeta=17./3.
+zeta=11./3.
 Nx=128
 Ny=128
 Nz=128
@@ -120,28 +120,32 @@ A_kz_i=np.zeros((Nx,Ny,Nz))
 
 #k_min=0.1
 
-#print ('k_max,k_min',k_max,k_min)
+
 
 k_max=max(np.max(abs(x1)),np.max(abs(y1)),np.max(abs(z1)))
 
 k_min=max(np.min(abs(x1[1:])),np.min(abs(y1[1:])),np.min(abs(z1[1:])))
 
+print ('k_max,k_min',k_max,k_min)
 
 mask=k1>k_min
 mask&=k1<k_max
 
 #print (mask)
 #mask &=k1<6.
-sigma[mask]=np.sqrt(k1[mask]**(-zeta)) 
+#sigma[mask]=np.sqrt(k1[mask]**(-zeta)) 
+k_0=k_min+1.0
+sigma[mask]=np.sqrt((k1[mask]**2)*np.exp(-k1[mask]**2/k_0**2))
 #sigma[mask]=2.0
-delta=0.5  #deviation around the max probability point
-phi=2*np.pi*np.random.random((Nx,Ny,Nz))
+phi=2*np.pi*np.random.uniform(0,1,(Nx,Ny,Nz))
 A_mag=np.zeros((Nx,Ny,Nz))
+
+
+
 
 A_mag[mask]=np.random.rayleigh(sigma[mask])
 
-#print (A_mag)
-#print (phi)
+
 A_kx_r[mask]=A_mag[mask]*np.cos(phi[mask])
 A_kx_i[mask]=A_mag[mask]*np.sin(phi[mask])
 
@@ -149,7 +153,7 @@ A_kx_i[mask]=A_mag[mask]*np.sin(phi[mask])
 del A_mag,phi
 
 A_mag=np.zeros((Nx,Ny,Nz))
-phi=2*np.pi*np.random.random((Nx,Ny,Nz))
+phi=2*np.pi*np.random.uniform(0,1,(Nx,Ny,Nz))
 A_mag[mask]=np.random.rayleigh(sigma[mask])
 
 A_ky_r[mask]=A_mag[mask]*np.cos(phi[mask])
@@ -159,7 +163,7 @@ A_ky_i[mask]=A_mag[mask]*np.sin(phi[mask])
 del A_mag,phi
 
 A_mag=np.zeros((Nx,Ny,Nz))
-phi=2*np.pi*np.random.random((Nx,Ny,Nz))
+phi=2*np.pi*np.random.uniform(0,1,(Nx,Ny,Nz))
 A_mag[mask]=np.random.rayleigh(sigma[mask])
 
 
@@ -169,20 +173,14 @@ A_kz_i[mask]=A_mag[mask]*np.sin(phi[mask])
 del A_mag,phi
 
 
-#print ('max_Aky',np.max(A_ky_i[mask]))
-
 A_arr=np.sqrt(A_kz_i**2+A_kz_r**2+A_ky_i**2+A_ky_r**2+A_kx_i**2+A_kx_r**2) 
 
-#A_arr=np.sqrt(A_kz**2+A_ky**2+A_kx**2) 
-#print (A_arr[mask])
-#print (np.exp(2*np.pi*0.234*1j))
+
 
 
 
 # saving the vector potential in real space after ifftn
 print (np.min(A_arr),np.max(A_arr))  
-#Ax[k1<0.1]=0;Ay[k1<0.1]=0;Az[k1<0.1]=0.0;
-#A_arr[k<0.1]=0
 
 
 A_kx=np.fft.ifftn(A_kx_r+A_kx_i*1.j)
@@ -264,36 +262,12 @@ plt.legend()
 plt.title(r"$\mathrm{k\, vs\, |Ak|^2\, (log-log\,plot)}$")
 plt.show()
 
+'''
+
 
 #************************ Magnetic field *************************************8
 
-B=np.zeros(Nx*Ny*Nz)
-Bx=np.zeros((Nx,Ny,Nz))
-By=np.zeros((Nx,Ny,Nz))
-Bz=np.zeros((Nx,Ny,Nz))
-l=0
-for k in range(Nz):   # y is rows, x is columns in the z=constant plane
-	for i in range(Ny):
-		for j in range(Nx):
-			Bx[j,i,k]=(ky[j,i,k]*A_kz[j,i,k]-kz[j,i,k]*A_ky[j,i,k])
-			By[j,i,k]=-(kx[j,i,k]*A_kz[j,i,k]-kz[j,i,k]*A_kx[j,i,k])
-			Bz[j,i,k]=(kx[j,i,k]*A_ky[j,i,k]-ky[j,i,k]*A_kx[j,i,k])
-			l=l+1
-	
 
-
-
-
-
-'''
-
-#Bx=np.zeros((Nx,Ny,Nz))
-#By=np.zeros((Nx,Ny,Nz))
-#Bz=np.zeros((Nx,Ny,Nz))
-
-#print ([mask])
-
-#print (np.max(A_kz))
 Bx= (ky*(A_kz_r*1.j-A_kz_i) - kz*(A_ky_r*1.j-A_ky_i))
 By =(- kx*(A_kz_r*1.j-A_kz_i) + kz*(A_kx_r*1.j-A_kx_i))     # i**2= -1.
 Bz = (kx*(A_ky_r*1.j-A_ky_i) - ky*(A_kx_r*1.j-A_kx_i))
@@ -348,8 +322,8 @@ del A_kz_r,A_kz_i
 del A_ky_r,A_ky_i
 del A_kx_r,A_kx_i
 del sigma
-del k1
-'''
+
+
 B=np.ndarray.flatten(B)
 k1=np.ndarray.flatten(k1)
 
@@ -398,9 +372,9 @@ dbfile=open('mag3d.pkl','wb')
 pickle.dump(B,dbfile)
 dbfile.close()
 
+'''
 
-
-
+del k1
 del Bx
 del By
 del Bz
