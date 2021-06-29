@@ -33,9 +33,9 @@ def func(x,m,c):
  
 
 zeta=3.
-Nx=100
-Ny=120
-Nz=128
+Nx=10
+Ny=12
+Nz=14
 
 L=10.
 
@@ -79,8 +79,13 @@ print (y1)
 ky,kx,kz=np.meshgrid(y1,x1,z1)
 #print ('ky shape',ky.shape)
 
+<<<<<<< HEAD
+print (ky)
+print (ky[0,0,:],ky[1,0,:])
+=======
 print (kz[99,34,:])
 #print (ky)
+>>>>>>> 9ba9cf1096da93388f8b050ed5790f35611be3e5
 k1=np.sqrt(ky**2+kx**2+kz**2)
 
 

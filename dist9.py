@@ -34,9 +34,9 @@ def func(x,m,c):
  
 
 zeta=5.
-Nx=256
-Ny=256
-Nz=256
+Nx=128
+Ny=128
+Nz=128
 
 L=2.
 
@@ -88,7 +88,7 @@ k1=np.sqrt(ky**2+kx**2+kz**2)
 #print (k1.shape)
 
 
-print ('wavenumber k min and max',k1.min(),k1.max())
+print ('wavenumber k min and max',np.min(k1[k1!=0]),k1.max())
 
 
 
@@ -136,7 +136,7 @@ k_max=max(np.max(abs(x1)),np.max(abs(y1)),np.max(abs(z1)))
 
 k_min=max(np.min(abs(x1[1:])),np.min(abs(y1[1:])),np.min(abs(z1[1:])))
 
-
+print ('k_min and k_max is',k_min,k_max)
 mask=k1>k_min
 mask&=k1<k_max
 
@@ -200,15 +200,15 @@ A_ky=np.fft.ifftn(A_ky_r+A_ky_i*1.j)
 A_kz=np.fft.ifftn(A_kz_r+A_kz_i*1.j)
 
 
-dbfile=open('akx3d_x.pkl','wb')
+dbfile=open('ak3d_x.pkl','wb')
 pickle.dump(A_kx,dbfile)
 dbfile.close()
 
-dbfile=open('aky3d_y.pkl','wb')
+dbfile=open('ak3d_y.pkl','wb')
 pickle.dump(A_ky,dbfile)
 dbfile.close()
 
-dbfile=open('akz3d_z.pkl','wb')
+dbfile=open('ak3d_z.pkl','wb')
 pickle.dump(A_kz,dbfile)
 dbfile.close()
 
@@ -358,13 +358,13 @@ del A_kz_r,A_kz_i
 del A_ky_r,A_ky_i
 del A_kx_r,A_kx_i
 del sigma
-del k1
-'''
+
+
 B=np.ndarray.flatten(B)
 k1=np.ndarray.flatten(k1)
 
 print (B)
-
+'''
 k1=np.asarray(k1)[B!=0].tolist()
 B=B[B!=0].tolist()
 
@@ -390,8 +390,8 @@ plt.legend()
 plt.title(r"$\mathrm{k\, vs\, |Bk|^2\, (log-log\,plot)}$")
 
 plt.show()
-'''
 
+'''
 dbfile=open('mag3d_x.pkl','wb')
 pickle.dump(Bx_fft,dbfile)
 dbfile.close()
@@ -408,7 +408,7 @@ dbfile=open('mag3d.pkl','wb')
 pickle.dump(B,dbfile)
 dbfile.close()
 
-
+del k1
 
 
 del Bx

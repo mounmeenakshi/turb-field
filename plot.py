@@ -12,7 +12,11 @@ Nx=128;Ny=128;Nz=128;
 #mag=np.reshape(mag.real,(N,N,N))
 
 #print (np.min(mag),np.max(mag))
+<<<<<<< HEAD
 mag_r=mag[40,:,:].real
+=======
+mag_r=mag[30,:,:].real
+>>>>>>> c2b9b365b955ff3011e5518cd60d81f25f398f4a
 mag_r=mag_r.T
 
 arr1=np.arange(0,Nx)
@@ -33,3 +37,4 @@ plt.tight_layout()
 #plt.grid()
 #fig.savefig('/mnt/home/student/cmeenakshi/public/folders/images_236/temp_t_90_shock_100.png',dpi=300)
 plt.show()
+del mag,mag_r,arr1,arr2,arr3
